@@ -27,7 +27,7 @@ app.get("/user", async (req, res) => {
     const users = await User.find({ emailId: userEmail });
     if (users.length === 0) {
       res.status(404).send("User not found");
-    }else{
+    } else {
       res.send(users);
     }
   } catch (err) {
@@ -36,22 +36,67 @@ app.get("/user", async (req, res) => {
 });
 /**Creating the Feed API - GET/Feed - get all the user from the database...*/
 app.get("/feed", async (req, res) => {
-  try{
-    const users= await User.find({});
+  try {
+    const users = await User.find({});
     res.send(users);
-  }catch(err){
+  } catch (err) {
     res.status(400).send("something went wrong!!");
   }
 });
 /**Creating the API to find user by Id */
-app.get('/userId',async (req,res)=>{
-  const userID =req.body._id;
-  try{
-    const user=await User.findById({_id:userID});
-    if(!user){
-      res.status(404).send('User not found!');
-    }else{
+app.get("/userId", async (req, res) => {
+  const userID = req.body._id;
+  try {
+    const user = await User.findById({ _id: userID });
+    if (!user) {
+      res.status(404).send("User not found!");
+    } else {
       res.send(user);
+    }
+  } catch (err) {
+    res.status(400).send("something went wrong!!");
+  }
+});
+/**Creating the API to delete the user by Id */
+app.delete("/user", async (req, res) => {
+  const userId = req.body._id;
+  try {
+    const user= await User.findByIdAndDelete(userId);
+    if(!user){
+      res.status(404).send("User not found!");
+    }else{
+      res.send("User Deleted Successfully!!!!");
+    }
+
+  } catch (err) {
+    res.status(400).send("something went wrong!!");
+  }
+});
+/**Creating the API to update the user by Id */
+app.patch('/user',async (req,res)=>{
+  const userId= req.body._id;
+  const data= req.body;
+  try{
+    const user= await User.findByIdAndUpdate({_id:userId},data);
+    if(!user){
+      res.status(404).send("User not found!");
+    }else{
+      res.send("User updated Successfully!!!");
+    }
+  }catch(err){
+    res.status(400).send("something went wrong!!");
+  }
+});
+/**Creating the API to update the user by emailId */
+app.patch('/user/emailId',async (req,res)=>{
+  const userEmailId= req.body.emailId;
+  const data= req.body;
+  try{
+    const user = await User.updateOne({emailId:userEmailId},data);
+    if(!user){
+      res.status(404).send("User not found!");
+    }else{
+      res.send("User updated Successfully!!!");
     }
 
   }catch(err){
