@@ -43,6 +43,21 @@ app.get("/feed", async (req, res) => {
     res.status(400).send("something went wrong!!");
   }
 });
+/**Creating the API to find user by Id */
+app.get('/userId',async (req,res)=>{
+  const userID =req.body._id;
+  try{
+    const user=await User.findById({_id:userID});
+    if(!user){
+      res.status(404).send('User not found!');
+    }else{
+      res.send(user);
+    }
+
+  }catch(err){
+    res.status(400).send("something went wrong!!");
+  }
+})
 /**Connection to the Database and Staring the Server... */
 connectDB()
   .then(() => {
