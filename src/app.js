@@ -61,48 +61,61 @@ app.get("/userId", async (req, res) => {
 app.delete("/user", async (req, res) => {
   const userId = req.body._id;
   try {
-    const user= await User.findByIdAndDelete(userId);
-    if(!user){
+    const user = await User.findByIdAndDelete(userId);
+    if (!user) {
       res.status(404).send("User not found!");
-    }else{
+    } else {
       res.send("User Deleted Successfully!!!!");
     }
-
   } catch (err) {
     res.status(400).send("something went wrong!!");
   }
 });
 /**Creating the API to update the user by Id */
-app.patch('/user',async (req,res)=>{
-  const userId= req.body._id;
-  const data= req.body;
-  try{
-    const user= await User.findByIdAndUpdate({_id:userId},data);
-    if(!user){
+app.patch("/user/:_id", async (req, res) => {
+  const userId = req.params?._id;
+  const data = req.body;
+
+  try {
+    const ALLOWED_UPDATED = [
+
+      "photoUrl",
+      "about",
+      "gender",
+      "age",
+      "skills",
+    ];
+    const isUpdateAllowed = Object.keys(data).every((k)=>ALLOWED_UPDATED.includes(k));
+    if (!isUpdateAllowed) {
+      throw new Error("Update Not Allowed!!!");
+    }
+    const user = await User.findByIdAndUpdate({ _id: userId }, data, {
+      runValidators: true,
+    });
+    if (!user) {
       res.status(404).send("User not found!");
-    }else{
+    } else {
       res.send("User updated Successfully!!!");
     }
-  }catch(err){
-    res.status(400).send("something went wrong!!");
+  } catch (err) {
+    res.status(400).send("something went wrong!!"+err.message);
   }
 });
 /**Creating the API to update the user by emailId */
-app.patch('/user/emailId',async (req,res)=>{
-  const userEmailId= req.body.emailId;
-  const data= req.body;
-  try{
-    const user = await User.updateOne({emailId:userEmailId},data);
-    if(!user){
+app.patch("/user/emailId", async (req, res) => {
+  const userEmailId = req.body.emailId;
+  const data = req.body;
+  try {
+    const user = await User.updateOne({ emailId: userEmailId }, data);
+    if (!user) {
       res.status(404).send("User not found!");
-    }else{
+    } else {
       res.send("User updated Successfully!!!");
     }
-
-  }catch(err){
+  } catch (err) {
     res.status(400).send("something went wrong!!");
   }
-})
+});
 /**Connection to the Database and Staring the Server... */
 connectDB()
   .then(() => {
