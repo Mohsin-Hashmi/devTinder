@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
+const bcrypt = require("bcrypt");
 const { adminAuth, userAuth } = require("./middlewares/auth");
 
 app.use(
@@ -11,10 +12,36 @@ app.use(
 /**Create the POST API */
 app.post("/signup", async (req, res, next) => {
   /** Creating a new instance of the User Model */
-  const users = new User(req.body);
+  const { firstName, lastName, emailId, password } = req.body;
+  /**Validate presence of all required fields */
+  if (!firstName || !lastName || !emailId || !password) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+  /**Validate Email Patttern */
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(emailId)) {
+    return res.status(400).json({ error: "Invalid Email Format" });
+  }
+
+  /**Validate the password length */
+  if (password.length < 6) {
+    return res
+      .status(400)
+      .json({ error: "Password must be at least 6 characters long" });
+  }
   try {
+    /**Hash the password before saving */
+    const hashedPassword = await bcrypt.hash(password, 10);
+    /**Creating the new instance of the User model */
+    const users = new User({
+      firstName,
+      lastName,
+      emailId,
+      password: hashedPassword,
+    });
+
     await users.save();
-    res.send("User added Successfully...");
+    res.json({ message: "User signed up successfully" });
   } catch (err) {
     res.status(400).send("Error saving the user:" + err.message);
   }
@@ -23,6 +50,13 @@ app.post("/signup", async (req, res, next) => {
 /**Creating the GET API to find or get the data of single user... */
 app.get("/user", async (req, res) => {
   const userEmail = req.body.emailId;
+  if (!userEmail) {
+    return res.status(400).json({ error: "Email ID is required..." });
+  }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(userEmail)) {
+    return res.status(400).json({ error: "Invalid email format..." });
+  }
   try {
     const users = await User.find({ emailId: userEmail });
     if (users.length === 0) {
@@ -46,15 +80,19 @@ app.get("/feed", async (req, res) => {
 /**Creating the API to find user by Id */
 app.get("/userId", async (req, res) => {
   const userID = req.body._id;
-  try {
-    const user = await User.findById({ _id: userID });
-    if (!user) {
-      res.status(404).send("User not found!");
-    } else {
-      res.send(user);
+  if (!userID) {
+    return res.status(400).json({ error: "User Id not Exist..." });
+  } else {
+    try {
+      const user = await User.findById({ _id: userID });
+      if (!user) {
+        res.status(404).send("User not found!");
+      } else {
+        res.send(user);
+      }
+    } catch (err) {
+      res.status(400).send("something went wrong!!");
     }
-  } catch (err) {
-    res.status(400).send("something went wrong!!");
   }
 });
 /**Creating the API to delete the user by Id */
@@ -77,28 +115,26 @@ app.patch("/user/:_id", async (req, res) => {
   const data = req.body;
 
   try {
-    const ALLOWED_UPDATED = [
-
-      "photoUrl",
-      "about",
-      "gender",
-      "age",
-      "skills",
-    ];
-    const isUpdateAllowed = Object.keys(data).every((k)=>ALLOWED_UPDATED.includes(k));
+    const ALLOWED_UPDATED = ["photoUrl", "about", "gender", "age", "skills"];
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATED.includes(k)
+    );
     if (!isUpdateAllowed) {
       throw new Error("Update Not Allowed!!!");
     }
     const user = await User.findByIdAndUpdate({ _id: userId }, data, {
       runValidators: true,
     });
+    if (req.body.skills.length > 10) {
+      res.status(400).json({ meaage: "Skills can't be more than 10." });
+    }
     if (!user) {
       res.status(404).send("User not found!");
     } else {
       res.send("User updated Successfully!!!");
     }
   } catch (err) {
-    res.status(400).send("something went wrong!!"+err.message);
+    res.status(400).send("something went wrong!!" + err.message);
   }
 });
 /**Creating the API to update the user by emailId */
