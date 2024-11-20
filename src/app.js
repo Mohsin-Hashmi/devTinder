@@ -3,6 +3,7 @@ const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
 const bcrypt = require("bcrypt");
+const { validateSignUpData } = require("./utils/validation");
 const { adminAuth, userAuth } = require("./middlewares/auth");
 
 app.use(
@@ -11,27 +12,13 @@ app.use(
 
 /**Create the POST API */
 app.post("/signup", async (req, res, next) => {
-  /** Creating a new instance of the User Model */
-  const { firstName, lastName, emailId, password } = req.body;
-  /**Validate presence of all required fields */
-  if (!firstName || !lastName || !emailId || !password) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-  /**Validate Email Patttern */
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(emailId)) {
-    return res.status(400).json({ error: "Invalid Email Format" });
-  }
-
-  /**Validate the password length */
-  if (password.length < 6) {
-    return res
-      .status(400)
-      .json({ error: "Password must be at least 6 characters long" });
-  }
   try {
+    validateSignUpData(req);
+    /**Validate Email Patttern */
     /**Hash the password before saving */
+    const { firstName, lastName, emailId, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+    console.log(hashedPassword);
     /**Creating the new instance of the User model */
     const users = new User({
       firstName,
@@ -43,7 +30,7 @@ app.post("/signup", async (req, res, next) => {
     await users.save();
     res.json({ message: "User signed up successfully" });
   } catch (err) {
-    res.status(400).send("Error saving the user:" + err.message);
+    res.status(400).send("ERROR : " + err.message);
   }
 });
 
