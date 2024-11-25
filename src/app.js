@@ -2,14 +2,17 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
 const User = require("./models/user");
-const validator= require('validator');
+const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { validateSignUpData } = require("./utils/validation");
 const { adminAuth, userAuth } = require("./middlewares/auth");
+const cookieParser = require("cookie-parser");
 
 app.use(
   express.json()
 ); /* Express JSON middleware it convert JSON data to Javascript object...*/
+
+app.use(cookieParser()); /* cookie-parser middleware it parse cookie data */
 
 /**Create the POST API */
 app.post("/signup", async (req, res, next) => {
@@ -34,30 +37,42 @@ app.post("/signup", async (req, res, next) => {
 });
 
 /**Creating the login API */
-app.post('/login', async (req,res)=>{
-  try{
-    const {emailId,password}=req.body;
-    if(!validator.isEmail(emailId)){
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
+    if (!validator.isEmail(emailId)) {
       return res.status(400).send("Invalid Email ID ");
     }
-    const user= await User.findOne({emailId:emailId});
-    if(!user){
-      throw new Error ("Invalid Credentials")
-    }
-    const isPasswordValid= await bcrypt.compare(password,user.password);
-    if(isPasswordValid){
-      // Creating the JWT token.
-      // Add a token in to Cookie and send back to the user.
-      res.json({message:"Login Successfully!!!"});
-    }else{
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) {
       throw new Error("Invalid Credentials");
     }
-  }catch(err){
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    if (isPasswordValid) {
+      // Creating the JWT token.
+
+      // Add a token in to Cookie and send back to the user.
+      res.cookie("token", "fnsdfjsdkfsdfsdfksjdfsflsdkfsdfsdf");
+      res.json({ message: "Login Successfully!!!" });
+    } else {
+      throw new Error("Invalid Credentials");
+    }
+  } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
 });
 
-
+/**Creating the API to get the profile of the user */
+app.get("/profile", async (req, res) => {
+  try {
+    /**Validating the token in the cookie*/
+    const cookies = req.cookies;
+    console.log(cookies);
+    const { token } = cookie;
+  } catch (err) {
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
 
 /**Creating the GET API to find or get the data of single user... */
 app.get("/user", async (req, res) => {
