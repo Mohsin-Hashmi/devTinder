@@ -5,9 +5,9 @@ const User = require("./models/user");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { validateSignUpData } = require("./utils/validation");
-const { adminAuth, userAuth } = require("./middlewares/auth");
 const cookieParser = require("cookie-parser");
 const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(
   express.json()
@@ -63,28 +63,27 @@ app.post("/login", async (req, res) => {
   }
 });
 
-/**Creating the API to get the profile of the user */
-app.get("/profile", async (req, res) => {
+/**Creating the API to get the profile of the user by using userAuth middleware */
+app.get("/profile", userAuth, async (req, res) => {
   try {
-    /**Validating the token in the cookie*/
-    const cookies = req.cookies;
-    const { token } = cookies;
-    if(!token){
-      throw new Error("Invalid Token");
-    }
-    // validate the token
-    const decodedMessage= await jwt.verify(token, "DEV@Tinder$798");
-    const {_id}= decodedMessage;
-    console.log("Logged In user is :" + _id);
-    const user = await User.findById(_id);
+    const user = req.user;
     res.send(user);
-    if(!user){
+    if (!user) {
       throw new Error("User Not Found");
     }
   } catch (err) {
     res.status(400).send("ERROR : " + err.message);
   }
 });
+
+/**Creating the send connection request API */
+app.post('/sendConnectionRequest', async (req,res)=>{
+  try{
+
+  }catch(err){
+    res.status(400).send("ERROR : " + err.message);
+  }
+})
 
 /**Creating the GET API to find or get the data of single user... */
 app.get("/user", async (req, res) => {
@@ -107,6 +106,7 @@ app.get("/user", async (req, res) => {
     res.status(400).send("something went wrong!!");
   }
 });
+
 /**Creating the Feed API - GET/Feed - get all the user from the database...*/
 app.get("/feed", async (req, res) => {
   try {
@@ -116,6 +116,7 @@ app.get("/feed", async (req, res) => {
     res.status(400).send("something went wrong!!");
   }
 });
+
 /**Creating the API to find user by Id */
 app.get("/userId", async (req, res) => {
   const userID = req.body._id;
@@ -134,6 +135,7 @@ app.get("/userId", async (req, res) => {
     }
   }
 });
+
 /**Creating the API to delete the user by Id */
 app.delete("/user", async (req, res) => {
   const userId = req.body._id;
@@ -148,6 +150,7 @@ app.delete("/user", async (req, res) => {
     res.status(400).send("something went wrong!!");
   }
 });
+
 /**Creating the API to update the user by Id */
 app.patch("/user/:_id", async (req, res) => {
   const userId = req.params?._id;
@@ -176,6 +179,7 @@ app.patch("/user/:_id", async (req, res) => {
     res.status(400).send("something went wrong!!" + err.message);
   }
 });
+
 /**Creating the API to update the user by emailId */
 app.patch("/user/emailId", async (req, res) => {
   const userEmailId = req.body.emailId;
@@ -191,6 +195,7 @@ app.patch("/user/emailId", async (req, res) => {
     res.status(400).send("something went wrong!!");
   }
 });
+
 /**Connection to the Database and Staring the Server... */
 connectDB()
   .then(() => {
