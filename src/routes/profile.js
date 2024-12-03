@@ -31,4 +31,13 @@ profileRouter.patch("/profile/edit", userAuth, async (req, res) => {
   }
 });
 
+
+/**Creating the API to Update the password of the user forget password API */
+profileRouter.patch("/profile/password", async(req,res)=>{
+  try{
+
+  }catch(err){
+    res.status(400).send("ERROR : " + err.message);
+  }
+});
 module.exports = profileRouter;
