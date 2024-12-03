@@ -1,10 +1,10 @@
 const Validator = require("validator");
-const validateSignUpData =  (req) => {
+const validateSignUpData = (req) => {
   /**Extract the mandatory data for signup */
   const { firstName, lastName, emailId, password } = req.body;
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-//   const existingUser = await User.find({ emailId });
+  //   const existingUser = await User.find({ emailId });
   /**Validate presence of all required fields */
   if (!firstName || !lastName || !emailId || !password) {
     throw new Error("All fields are required.");
@@ -16,4 +16,21 @@ const validateSignUpData =  (req) => {
     throw new Error("Password in weak make a Strong Password");
   }
 };
-module.exports = { validateSignUpData };
+
+const validateEditProfileData = (req) => {
+  const allowedEditFields = [
+    "firstName",
+    "lastName",
+    "emailId",
+    "photoUrl",
+    "about",
+    "skills",
+    "gender",
+    "age",
+  ];
+
+  const isEditAllowed= Object.keys(req.body).every((field) => allowedEditFields.includes(field));
+  return isEditAllowed;
+};
+
+module.exports = { validateSignUpData, validateEditProfileData };
