@@ -4,12 +4,13 @@ const { validateSignUpData } = require("../utils/validation");
 const User = require("../models/user");
 const validator = require("validator");
 const bcrypt = require("bcrypt");
-/**Create the POST API */
+
 authRouter.post("/signup", async (req, res, next) => {
     try {
       validateSignUpData(req);
-      /**Hash the password before saving */
+     
       const { firstName, lastName, emailId, password } = req.body;
+       /**Hash the password before saving */
       const hashedPassword = await bcrypt.hash(password, 10);
       /**Creating the new instance of the User model */
       const users = new User({
@@ -17,7 +18,7 @@ authRouter.post("/signup", async (req, res, next) => {
         lastName,
         emailId,
         password: hashedPassword,
-      });
+      });ss
   
       await users.save();
       res.json({ message: "User signed up successfully" });
