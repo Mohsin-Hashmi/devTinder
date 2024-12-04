@@ -4,6 +4,7 @@ const { userAuth } = require("../middlewares/auth");
 const { validateEditProfileData } = require("../utils/validation");
 const User = require("../models/user");
 const bcrypt = require("bcrypt");
+const validate= require('validator');
 /**Creating the API to get the profile of the user by using userAuth middleware */
 profileRouter.get("/profile/view", userAuth, async (req, res) => {
   try {
@@ -52,6 +53,9 @@ profileRouter.patch("/profile/password", userAuth, async (req, res) => {
       throw new Error("Incorrect Old Password");
     }
     
+    if(!validate.isStrongPassword(newPassword)){
+      throw new Error("Password in weak make a Strong Password");
+    }
     /**Hash the new Password before saving it */
     const hashedPassword = await bcrypt.hash(newPassword, 10);
     user.password = hashedPassword;
