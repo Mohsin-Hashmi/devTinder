@@ -17,7 +17,7 @@ requestRouter.post(
       if (!allowedStatus.includes(status)) {
         return res
           .status(400)
-          .json({ message: "Invalid status type: " + status });
+          .json({ message: "I nvalid status type: " + status });
       } 
 
       const toUser = await User.findById(toUserId);
