@@ -18,7 +18,7 @@ authRouter.post("/signup", async (req, res, next) => {
         lastName,
         emailId,
         password: hashedPassword,
-      });ss
+      });
   
       await users.save();
       res.json({ message: "User signed up successfully" });
