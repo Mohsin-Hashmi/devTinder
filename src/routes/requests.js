@@ -11,8 +11,8 @@ requestRouter.post(
   async (req, res) => {
     try {
       const fromUserId = req.user._id;
-      const toUserId = req.params?.toUserId;
-      const status = req.params?.status;
+      const toUserId = req.params.toUserId;
+      const status = req.params.status;
 
       const allowedStatus = ["ignored", "interested"];
       if (!allowedStatus.includes(status)) {
@@ -65,8 +65,8 @@ requestRouter.post(
   async (req, res) => {
     try {
       const loggedInUser = req.user;
-      const requestId = req.params?.requestId;
-      const status = req.params?.status;
+      const requestId = req.params.requestId;
+      const status = req.params.status;
 
       const allowedStatus = ["accepted", "rejected"];
 
@@ -93,8 +93,8 @@ requestRouter.post(
         });
       }
 
-      const byUser = await User.findById(loggedInUser);
-      if (!byUser) {
+      const requestAcceptedBy = await User.findById(loggedInUser);
+      if (!requestAcceptedBy) {
         return res.status(400).json({
           message: "User not found",
         });
@@ -105,7 +105,7 @@ requestRouter.post(
       const data = await connectionRequest.save();
 
       res.json({
-        message: "Connection Request " + status + " by " + byUser.firstName,
+        message: "Connection Request " + status + " by " + requestAcceptedBy.firstName,
         data,
       });
     } catch (err) {
