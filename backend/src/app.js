@@ -2,7 +2,13 @@ const express = require("express");
 const app = express();
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
+const cors = require('cors');
 
+app.use(cors({
+  origin: "http://localhost:5173", // Frontend origin
+  methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+  credentials: true, // Allows cookies and credential
+}))
 app.use(
   express.json()
 ); /* Express JSON middleware it convert JSON data to Javascript object...*/
