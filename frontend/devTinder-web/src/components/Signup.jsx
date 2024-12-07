@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 const Signup = () => {
   return (
     <>
-      <div className="flex items-center justify-center h-screen">
+      <div className="w-[1170px] flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <form className="p-[50px] m-auto w-1/2 border border-white rounded-3xl shadow-[0_15px_15px_rgba(255,255,255,0.3)]">
           <h1 className="text-3xl font-bold text-white mb-4 flex items-center justify-center">
             Create an account
@@ -11,6 +11,7 @@ const Signup = () => {
           <p className="text-center font-[14px] color-[#343434] mb-[10px]">
             Connect with your friends today!
           </p>
+          <label className="label-text mb-[10px] block">Enter you First Name</label>
           <label className="input input-bordered flex items-center gap-2 mb-[18px]">
           <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -22,6 +23,7 @@ const Signup = () => {
             </svg>
             <input type="text" className="grow" placeholder="First Name" required/>
           </label>
+          <label className="label-text  mb-[10px] block">Enter you Last Name</label>
           <label className="input input-bordered flex items-center gap-2 mb-[18px]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -34,6 +36,7 @@ const Signup = () => {
 
             <input type="text" className="grow" placeholder="Last Name" required/>
           </label>
+          <label className="label-text  mb-[10px] block">Enter you Email</label>
           <label className="input input-bordered flex items-center gap-2 mb-[18px]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -46,7 +49,7 @@ const Signup = () => {
             </svg>
             <input type="text" className="grow" placeholder="Email" required/>
           </label>
-
+          <label className="label-text  mb-[10px] block">Enter you Password</label>
           <label className="input input-bordered flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"

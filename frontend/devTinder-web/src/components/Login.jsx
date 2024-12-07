@@ -3,11 +3,13 @@ import { Link } from "react-router-dom";
 const Login = () => {
   return (
     <>
-      <div className="flex items-center justify-center h-screen">
-        <form className="p-[50px] m-auto w-1/2 border border-white rounded-3xl shadow-[0_15px_15px_rgba(255,255,255,0.3)]">
-          <h1 className="text-3xl font-bold text-white mb-4 flex items-center justify-center">
+      <div className="w-[600px] flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+        <form className="card-body p-[50px] m-auto w-1/2 border border-white rounded-3xl shadow-[0_15px_15px_rgba(255,255,255,0.3)]">
+          <h1 className=" card-title text-3xl font-bold text-white mb-4 flex items-center justify-center">
             Hi, Welcome Back! <span className="ml-2 animate-wave">👋</span>
           </h1>
+          
+          <label className="label-text">Enter you Email</label>
           <label className="input input-bordered flex items-center gap-2 mb-[18px]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -20,7 +22,7 @@ const Login = () => {
             </svg>
             <input type="text" className="grow" placeholder="Email" required />
           </label>
-
+          <label className="label-text">Enter you Password</label>
           <label className="input input-bordered flex items-center gap-2">
             <svg
               xmlns="http://www.w3.org/2000/svg"
