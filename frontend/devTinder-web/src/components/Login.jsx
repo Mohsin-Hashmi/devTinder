@@ -1,48 +1,93 @@
-import { useState, } from "react";
-import { Link , useNavigate } from "react-router-dom";
-
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import ErrorPopup from "./ErrorPopup";
 // import axios from 'axios';
 const Login = () => {
-  const [emailId, setEmailId]= useState("");
-  const [password, setPassword]= useState("");
-  const [showPassword, setShowPassword]= useState(false);
-  const navigate= useNavigate();
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [showError, setShowError] = useState(false);
+  const navigate = useNavigate();
 
-  const handleshowPassword=()=>{
+  const handleshowPassword = () => {
     setShowPassword((show_password) => !show_password);
-  }
+  };
 
-  
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    // Make the API call
-    const response = await fetch("http://localhost:3000/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ emailId, password }), credentials: "include", 
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || "Login failed");
+  // Form validation
+  const validateForm = () => {
+    let isValid = true;
+    
+
+    if (!emailId) {
+      setErrorMessage("Email is required");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(emailId)) {
+      setErrorMessage("Invalid Email");
+      isValid = false;
     }
 
-    const data = await response.json();
-    console.log("login Successfully!!!")
-  
-    // Store token if required
-    localStorage.setItem("token", data.token);
-    navigate('/profile')
+    if (!password) {
+      setErrorMessage("Password is required");
+      isValid = false;
+    } else if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters");
+      isValid = false;
+    }
+
+    return isValid;
   };
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if(validateForm()){
+      try {
+        // Make the API call
+        const response = await fetch("http://localhost:3000/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ emailId, password }),
+          credentials: "include",
+        });
   
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Login failed");
+        }
+  
+        const data = await response.json();
+        console.log("login Successfully!!!");
+  
+        // Store token if required
+        localStorage.setItem("token", data.token);
+        navigate("/profile");
+        setErrorMessage("");
+        setShowError(false);
+      } catch (err) {
+        setErrorMessage(err.message); 
+        setShowError(true); 
+      }
+    }else{
+      setShowError(true);
+    }
+    
+  };
+
+  const closeErrorPopup = () => {
+    setShowError(false);
+  };
   return (
     <>
+    {showError && <ErrorPopup message={errorMessage} onClose={closeErrorPopup} />}
       <div className="w-[600px] flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
-        <form onSubmit={handleLogin} className="card-body p-[50px] m-auto w-1/2 border border-white rounded-3xl shadow-[0_15px_15px_rgba(255,255,255,0.3)]">
+        <form
+          onSubmit={handleLogin}
+          className="card-body p-[50px] m-auto w-1/2 border border-white rounded-3xl shadow-[0_15px_15px_rgba(255,255,255,0.3)]"
+        >
           <h1 className=" card-title text-3xl font-bold text-white mb-4 flex items-center justify-center">
             Hi, Welcome Back! <span className="ml-2 animate-wave">👋</span>
           </h1>
-          
+
           <label className="label-text">Enter you Email</label>
           <label className="input input-bordered flex items-center gap-2 mb-[18px]">
             <svg
@@ -54,7 +99,14 @@ const Login = () => {
               <path d="M2.5 3A1.5 1.5 0 0 0 1 4.5v.793c.026.009.051.02.076.032L7.674 8.51c.206.1.446.1.652 0l6.598-3.185A.755.755 0 0 1 15 5.293V4.5A1.5 1.5 0 0 0 13.5 3h-11Z" />
               <path d="M15 6.954 8.978 9.86a2.25 2.25 0 0 1-1.956 0L1 6.954V11.5A1.5 1.5 0 0 0 2.5 13h11a1.5 1.5 0 0 0 1.5-1.5V6.954Z" />
             </svg>
-            <input type="email" value={emailId} onChange={(e)=>setEmailId(e.target.value)} className="grow" placeholder="Email" required />
+            <input
+              type="email"
+              value={emailId}
+              onChange={(e) => setEmailId(e.target.value)}
+              className="grow"
+              placeholder="Email"
+              required
+            />
           </label>
           <label className="label-text">Enter you Password</label>
           <label className="input input-bordered flex items-center gap-2">
@@ -71,9 +123,9 @@ const Login = () => {
               />
             </svg>
             <input
-              type= {showPassword ? "text" : "password"}
+              type={showPassword ? "text" : "password"}
               value={password}
-              onChange={(e)=>setPassword(e.target.value)}
+              onChange={(e) => setPassword(e.target.value)}
               className="grow"
               placeholder="Password"
               required
@@ -86,7 +138,6 @@ const Login = () => {
                 className="form-checkbox text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
                 checked={showPassword}
                 onChange={handleshowPassword}
-
               />
               <span className="ml-2 text-gray-700">Show Password</span>
             </label>
@@ -97,7 +148,10 @@ const Login = () => {
           </div>
 
           <div className="flex items-center">
-            <button type="submit" className="btn btn-wide mx-auto mt-[10px] border border-white hover:border-green-500">
+            <button
+              type="submit"
+              className="btn btn-wide mx-auto mt-[10px] border border-white hover:border-green-500"
+            >
               Login
             </button>
           </div>
