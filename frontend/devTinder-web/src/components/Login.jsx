@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ErrorPopup from "./ErrorPopup";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
+import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -44,7 +45,7 @@ const Login = () => {
     e.preventDefault();
     if (validateForm()) {
         try {
-            const response = await fetch("http://localhost:3000/login", {
+            const response = await fetch(BASE_URL + "/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ emailId, password }),
@@ -56,17 +57,17 @@ const Login = () => {
                 throw new Error(errorData.message || "Login failed");
             }
 
-            const data = await response.json(); // Parse the JSON response
-            console.log("Login Successful!", data);
+            const user = await response.json(); // Parse the JSON response
+            console.log("Login Successful!", user);
 
             // Dispatch only the serialized user data
-            dispatch(addUser(data));
+            dispatch(addUser(user));
 
             // Store token in localStorage
-            localStorage.setItem("token", data.token);
+            localStorage.setItem("token", user.token);
 
             // Navigate to profile page
-            navigate("/profile");
+            navigate("/feed");
             setErrorMessage("");
             setShowError(false);
         } catch (err) {

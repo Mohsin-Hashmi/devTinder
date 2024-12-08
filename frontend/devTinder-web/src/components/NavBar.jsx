@@ -2,6 +2,7 @@ import { useSelector } from "react-redux";
 
 const NavBar = () => {
   const user = useSelector((store) => store.user);
+
   return (
     <>
       <div className="navbar bg-base-300">
@@ -17,8 +18,8 @@ const NavBar = () => {
                 className="input input-bordered w-40 md:w-auto"
               />
             </div> 
-
-            <div className="dropdown dropdown-end mx-10">
+            <p>Welcome, {user.firstName}</p>
+            <div className="dropdown dropdown-end mx-5">
               <div
                 tabIndex={0}
                 role="button"
@@ -49,7 +50,7 @@ const NavBar = () => {
                 </li>
               </ul>
             </div>
-            <p>Wellcome,  {user.firstName}</p>
+           
           </div>
         )}
       </div>
