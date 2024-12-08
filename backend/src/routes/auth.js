@@ -51,8 +51,20 @@ authRouter.post("/login", async (req, res) => {
 
     res.status(200).json({ data: user });
   } catch (err) {
-    res.status(500).json({ error: "Failed to process request" });
+    res.status(400).send("ERROR : " + err.message);
   }
 });
+
+authRouter.post('/logout', async(req,res)=>{
+  try{
+    res.cookie("token", null, {
+      expires: new Date(Date.now())
+    })
+    res.json({message: "User logged out successfully"})
+  }catch(err){
+    res.status(400).send("ERROR: " + err.message);
+  }
+})
+
 
 module.exports = authRouter;
