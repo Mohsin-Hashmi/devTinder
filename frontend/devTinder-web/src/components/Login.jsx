@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import ErrorPopup from "./ErrorPopup";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
-// import axios from 'axios';
+
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
@@ -17,9 +17,10 @@ const Login = () => {
     setShowPassword((show_password) => !show_password);
   };
 
-  // Form validation
+  /**  Form validation */
   const validateForm = () => {
     let isValid = true;
+    /**validation for email*/
     if (!emailId) {
       setErrorMessage("Email is required");
       isValid = false;
@@ -28,6 +29,7 @@ const Login = () => {
       isValid = false;
     }
 
+    /**validation for password*/
     if (!password) {
       setErrorMessage("Password is required");
       isValid = false;
@@ -41,37 +43,41 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      try {
-        // Make the API call
-        const response = await fetch("http://localhost:3000/login", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ emailId, password }),
-          credentials: "include",
-        });
-        dispatch(addUser(response))
+        try {
+            const response = await fetch("http://localhost:3000/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ emailId, password }),
+                credentials: "include",
+            });
 
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || "Login failed");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || "Login failed");
+            }
+
+            const data = await response.json(); // Parse the JSON response
+            console.log("Login Successful!", data);
+
+            // Dispatch only the serialized user data
+            dispatch(addUser(data));
+
+            // Store token in localStorage
+            localStorage.setItem("token", data.token);
+
+            // Navigate to profile page
+            navigate("/profile");
+            setErrorMessage("");
+            setShowError(false);
+        } catch (err) {
+            setErrorMessage(err.message);
+            setShowError(true);
         }
-
-        const data = await response.json();
-        console.log("login Successfully!!!");
-
-        // Store token
-        localStorage.setItem("token", data.token);
-        navigate("/profile");
-        setErrorMessage("");
-        setShowError(false);
-      } catch (err) {
-        setErrorMessage(err.message);
-        setShowError(true);
-      }
     } else {
-      setShowError(true);
+        setShowError(true);
     }
-  };
+};
+
 
   const closeErrorPopup = () => {
     setShowError(false);
