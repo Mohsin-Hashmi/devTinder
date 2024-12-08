@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import ErrorPopup from "./ErrorPopup";
+import { useDispatch } from "react-redux";
+import { addUser } from "../utils/userSlice";
 // import axios from 'axios';
 const Login = () => {
   const [emailId, setEmailId] = useState("");
@@ -8,18 +10,16 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
+  const dispatch= useDispatch();
   const navigate = useNavigate();
 
   const handleshowPassword = () => {
     setShowPassword((show_password) => !show_password);
   };
 
-
   // Form validation
   const validateForm = () => {
     let isValid = true;
-    
-
     if (!emailId) {
       setErrorMessage("Email is required");
       isValid = false;
@@ -40,7 +40,7 @@ const Login = () => {
   };
   const handleLogin = async (e) => {
     e.preventDefault();
-    if(validateForm()){
+    if (validateForm()) {
       try {
         // Make the API call
         const response = await fetch("http://localhost:3000/login", {
@@ -49,28 +49,28 @@ const Login = () => {
           body: JSON.stringify({ emailId, password }),
           credentials: "include",
         });
-  
+        dispatch(addUser(response))
+
         if (!response.ok) {
           const errorData = await response.json();
           throw new Error(errorData.message || "Login failed");
         }
-  
+
         const data = await response.json();
         console.log("login Successfully!!!");
-  
-        // Store token if required
+
+        // Store token
         localStorage.setItem("token", data.token);
         navigate("/profile");
         setErrorMessage("");
         setShowError(false);
       } catch (err) {
-        setErrorMessage(err.message); 
-        setShowError(true); 
+        setErrorMessage(err.message);
+        setShowError(true);
       }
-    }else{
+    } else {
       setShowError(true);
     }
-    
   };
 
   const closeErrorPopup = () => {
@@ -78,7 +78,9 @@ const Login = () => {
   };
   return (
     <>
-    {showError && <ErrorPopup message={errorMessage} onClose={closeErrorPopup} />}
+      {showError && (
+        <ErrorPopup message={errorMessage} onClose={closeErrorPopup} />
+      )}
       <div className="w-[600px] flex items-center justify-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
         <form
           onSubmit={handleLogin}
