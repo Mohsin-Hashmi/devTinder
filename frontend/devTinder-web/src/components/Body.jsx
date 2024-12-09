@@ -10,7 +10,7 @@ const Body = () => {
   const navigate = useNavigate();
   const userData = useSelector((store) => store.user);
   const fetchUser = async () => {
-    if(userData) return
+    if (userData) return;
     try {
       const res = await fetch(BASE_URL + "/profile/view", {
         method: "GET",
@@ -33,7 +33,7 @@ const Body = () => {
   };
   useEffect(() => {
     fetchUser();
-  });
+  },[]);
   return (
     <>
       <NavBar />

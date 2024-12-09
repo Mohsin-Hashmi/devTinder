@@ -6,8 +6,8 @@ import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
 
 const Login = () => {
-  const [emailId, setEmailId] = useState("mohsin@gmail.com");
-  const [password, setPassword] = useState("Mohsin@123");
+  const [emailId, setEmailId] = useState("");
+  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
@@ -54,11 +54,11 @@ const Login = () => {
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || "Login failed");
+                throw new Error(errorData.message || "Invalid Credentials");
             }
 
             const user = await response.json(); // Parse the JSON response
-            console.log("Login Successful!", user);
+          
 
             // Dispatch only the serialized user data
             dispatch(addUser(user));
@@ -114,7 +114,7 @@ const Login = () => {
               onChange={(e) => setEmailId(e.target.value)}
               className="grow"
               placeholder="Email"
-              required
+              
             />
           </label>
           <label className="label-text">Enter you Password</label>
@@ -137,7 +137,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="grow"
               placeholder="Password"
-              required
+              
             />
           </label>
           <div className="flex items-center justify-between text-sm mt-4">
