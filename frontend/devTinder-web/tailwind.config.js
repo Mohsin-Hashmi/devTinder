@@ -20,7 +20,7 @@ export default {
     },
   },
   daisyui: {
-    themes: ["light", "dark", "cupcake", "synthwave"],
+    themes: ["light", "dark", "cupcake", "synthwave", "coffee"],
   },
   plugins:[daisyui,]
 }
