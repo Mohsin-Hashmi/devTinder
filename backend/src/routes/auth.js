@@ -40,7 +40,6 @@ authRouter.post("/login", async (req, res) => {
       console.log("User not found");
       return res.status(400).json({ error: "Invalid Credentials" });
     }
-
     const isPasswordValid = await user.validatePassword(password);
     if (!isPasswordValid) {
       return res.status(400).json({ error: "Invalid Credentials" });
@@ -55,16 +54,15 @@ authRouter.post("/login", async (req, res) => {
   }
 });
 
-authRouter.post('/logout', async(req,res)=>{
-  try{
+authRouter.post("/logout", async (req, res) => {
+  try {
     res.cookie("token", null, {
-      expires: new Date(Date.now())
-    })
-    res.json({message: "User logged out successfully"})
-  }catch(err){
+      expires: new Date(Date.now()),
+    });
+    res.json({ message: "User logged out successfully" });
+  } catch (err) {
     res.status(400).send("ERROR: " + err.message);
   }
-})
-
+});
 
 module.exports = authRouter;

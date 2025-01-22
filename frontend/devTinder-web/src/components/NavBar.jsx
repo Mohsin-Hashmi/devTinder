@@ -3,16 +3,15 @@ import { Link, useNavigate } from "react-router-dom";
 import { BASE_URL } from "../utils/constants";
 import { useDispatch } from "react-redux";
 import { removeUser } from "../utils/userSlice";
-
+import axios from "axios";
 const NavBar = () => {
   const user = useSelector((store) => store.user);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const handleLogout = async () => {
     try {
-      const logoutUser = await fetch(BASE_URL + "/logout", {
-        method: "POST",
-        credentials: "include",
+      const logoutUser = await axios.post(`${BASE_URL}/logout`, {
+        withCredentials: true,
       });
       dispatch(removeUser(logoutUser));
       navigate("/login");
@@ -56,6 +55,11 @@ const NavBar = () => {
                   <Link to="/profile" className="justify-between">
                     Profile
                     <span className="badge">New</span>
+                  </Link>
+                </li>
+                <li>
+                  <Link to="/feed" className="justify-between">
+                    Feed
                   </Link>
                 </li>
                 <li>

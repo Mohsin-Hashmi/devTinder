@@ -4,14 +4,14 @@ import ErrorPopup from "./ErrorPopup";
 import { useDispatch } from "react-redux";
 import { addUser } from "../utils/userSlice";
 import { BASE_URL } from "../utils/constants";
-
+import axios from "axios";
 const Login = () => {
   const [emailId, setEmailId] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [showError, setShowError] = useState(false);
-  const dispatch= useDispatch();
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleshowPassword = () => {
@@ -29,7 +29,6 @@ const Login = () => {
       setErrorMessage("Invalid Email");
       isValid = false;
     }
-
     /**validation for password*/
     if (!password) {
       setErrorMessage("Password is required");
@@ -38,47 +37,29 @@ const Login = () => {
       setErrorMessage("Password must be at least 6 characters");
       isValid = false;
     }
-
     return isValid;
   };
   const handleLogin = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-        try {
-            const response = await fetch(BASE_URL + "/login", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ emailId, password }),
-                credentials: "include",
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.message || "Invalid Credentials");
-            }
-
-            const user = await response.json(); // Parse the JSON response
-          
-
-            // Dispatch only the serialized user data
-            dispatch(addUser(user));
-
-            // Store token in localStorage
-            localStorage.setItem("token", user.token);
-
-            // Navigate to profile page
-            navigate("/feed");
-            setErrorMessage("");
-            setShowError(false);
-        } catch (err) {
-            setErrorMessage(err.message);
-            setShowError(true);
-        }
-    } else {
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/login`,
+          { emailId, password },
+          { withCredentials: true }
+        );
+        dispatch(addUser(response.data)); // Dispatch only the serialized user data
+        navigate("/feed"); // Navigate to profile page
+        setErrorMessage("");
+        setShowError(false);
+      } catch (err) {
+        setErrorMessage(err.message);
         setShowError(true);
+      }
+    } else {
+      setShowError(true);
     }
-};
-
+  };
 
   const closeErrorPopup = () => {
     setShowError(false);
@@ -114,7 +95,6 @@ const Login = () => {
               onChange={(e) => setEmailId(e.target.value)}
               className="grow"
               placeholder="Email"
-              
             />
           </label>
           <label className="label-text">Enter you Password</label>
@@ -137,21 +117,17 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               className="grow"
               placeholder="Password"
-              
+            />
+            <input
+              type="checkbox"
+              className="form-checkbox text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
+              checked={showPassword}
+              onChange={handleshowPassword}
             />
           </label>
-          <div className="flex items-center justify-between text-sm mt-4">
-            <label className="flex items-center">
-              <input
-                type="checkbox"
-                className="form-checkbox text-blue-500 border-gray-300 rounded focus:ring focus:ring-blue-300"
-                checked={showPassword}
-                onChange={handleshowPassword}
-              />
-              <span className="ml-2 text-gray-700">Show Password</span>
-            </label>
-
-            <Link to="" className="text-red-500 hover:underline">
+          <div className="text-sm mt-4 flex justify-end">
+           
+            <Link to="" className="text-red-500 hover:underline ">
               Forgot Password?
             </Link>
           </div>
