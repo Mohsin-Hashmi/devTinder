@@ -21,6 +21,7 @@ const Login = () => {
   /**  Form validation */
   const validateForm = () => {
     let isValid = true;
+
     /**validation for email*/
     if (!emailId) {
       setErrorMessage("Email is required");
@@ -35,6 +36,10 @@ const Login = () => {
       isValid = false;
     } else if (password.length < 6) {
       setErrorMessage("Password must be at least 6 characters");
+      isValid = false;
+    }
+    if (!emailId && !password) {
+      setErrorMessage("Email and Password is required");
       isValid = false;
     }
     return isValid;
@@ -126,7 +131,6 @@ const Login = () => {
             />
           </label>
           <div className="text-sm mt-4 flex justify-end">
-           
             <Link to="" className="text-red-500 hover:underline ">
               Forgot Password?
             </Link>

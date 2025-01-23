@@ -39,6 +39,10 @@ const Signup = () => {
       setErrorMessage("Password must be at least 6 characters");
       isValid = false;
     }
+    if (!emailId && !password) {
+      setErrorMessage("Email and Password is required");
+      isValid = false;
+    }
     return isValid;
   };
   const handleSignup = async (e) => {
